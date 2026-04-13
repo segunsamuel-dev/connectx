@@ -1,4 +1,4 @@
-import { supabase } from './config.js';
+import { supabase } from './supabase.js';
 
 const signupForm = document.getElementById('signup-form');
 const errorToast = document.getElementById('error-message');
