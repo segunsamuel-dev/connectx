@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConnectX | Nexus</title>
+    <link rel="stylesheet" href="chat.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
+</head>
+<body class="light-mode">
+
+    <div class="app-canvas">
+        <aside class="rail">
+            <div class="rail-top">
+                <div class="rail-logo">CX<span>.</span></div>
+            </div>
+
+            <nav class="rail-center">
+                <button class="rail-btn" onclick="window.location.href='dashboard.html'">
+                    <i class="lni lni-grid-alt"></i>
+                    <span class="tooltip">Dashboard</span>
+                </button>
+                <button class="rail-btn active">
+                    <i class="lni lni-comments"></i>
+                    <span class="tooltip">Message</span>
+                </button>
+                <button class="rail-btn">
+                    <i class="lni lni-users"></i>
+                    <span class="tooltip">Add Friends</span>
+                </button>
+            </nav>
+
+            <div class="rail-bottom">
+                <button class="rail-btn settings-btn"><i class="lni lni-cog"></i></button>
+                <div class="rail-user-status" id="nav-avatar">U</div>
+            </div>
+        </aside>
+
+        <section class="navigator">
+            <div class="nav-header">
+                <h3>Messages</h3>
+                <div class="search-container">
+                    <i class="lni lni-search-alt"></i>
+                    <input type="text" placeholder="Search or add friend..." id="friend-search">
+                </div>
+                <button class="add-friend-btn"><i class="lni lni-plus"></i> ADD_FRIEND</button>
+            </div>
+            
+            <div class="contact-list" id="contact-list">
+                <div class="contact-card active">
+                    <div class="c-avatar">E</div>
+                    <div class="c-info">
+                        <div class="c-name">Ella</div>
+                        <div class="c-status">Typing...</div>
+                    </div>
+                    <span class="c-time">12:45</span>
+                </div>
+            </div>
+        </section>
+
+        <main class="nexus">
+            <header class="nexus-header">
+                <div class="active-user">
+                    <div class="user-orb">E</div>
+                    <div>
+                        <h4>Ella</h4>
+                        <span class="sys-tag">// UPLINK_STABLE</span>
+                    </div>
+                </div>
+                <div class="nexus-utils">
+                    <button class="util-btn"><i class="lni lni-phone"></i></button>
+                    <button class="util-btn"><i class="lni lni-more-alt"></i></button>
+                </div>
+            </header>
+
+            <div class="chat-stream" id="chat-stream">
+                <div class="msg-group incoming">
+                    <div class="msg-bubble">Hey! Did you check the new project dashboard?</div>
+                    <span class="msg-time">12:44 PM</span>
+                </div>
+                <div class="msg-group outgoing">
+                    <div class="msg-bubble">Yeah, looks elite. Minimalist and clean.</div>
+                    <span class="msg-time">12:45 PM</span>
+                </div>
+            </div>
+
+            <footer class="nexus-input">
+                <div class="input-pill">
+                    <button class="attach-btn"><i class="lni lni-paperclip"></i></button>
+                    <input type="text" placeholder="Send a message..." id="message-input">
+                    <button class="send-btn"><i class="lni lni-pointer-top"></i></button>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script type="module" src="chat.js"></script>
+</body>
+</html>
