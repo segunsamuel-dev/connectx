@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConnectX | User</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
+</head>
+<body class="light-mode">
+
+    <div class="app-canvas">
+        <aside class="rail">
+            <div class="rail-logo">CX<span>.</span></div>
+            <nav class="rail-actions">
+                <button class="rail-link active"><i class="lni lni-grid-alt"></i></button>
+                <button class="rail-link" onclick="window.location.href='chat.html'"><i class="lni lni-comments"></i></button>
+                <button class="rail-link"><i class="lni lni-users"></i></button>
+                <button class="rail-link"><i class="lni lni-cog"></i></button>
+            </nav>
+            <div class="rail-footer">
+                <button class="rail-item" id="theme-btn"><i class="lni lni-sun"></i></button>
+                <div class="rail-user" id="nav-avatar">U</div>
+            </div>
+        </aside>
+
+        <main class="viewport">
+            <header class="view-header">
+                <div class="header-id">
+                    <span class="sys-tag">//ACTIVE</span>
+                    <h1 id="welcome-msg">User</h1>
+                </div>
+                <div class="header-utils">
+                    <button class="tool-btn"><i class="lni lni-alarm"></i></button>
+                </div>
+            </header>
+
+            <div class="bento-grid">
+                <section class="bento-card identity-card">
+                    <div class="pfp-hex" id="pfp-trigger">
+                        <span id="pfp-initials">U</span>
+                    </div>
+                    <div class="id-meta">
+                        <h2 id="display-name">User</h2>
+                        <span id="display-email">user@connectx.sys</span>
+                        <div class="meta-actions">
+                            <button class="edit-pill" id="edit-profile"><i class="lni lni-pencil"></i> EDIT_PROFILE</button>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="bento-card placeholder-module">
+                    <i class="lni lni-pulse"></i>
+                    <span>SYSTEM_SYNC_READY</span>
+                </div>
+            </div>
+        </main>
+
+       
+    
+
+    <script type="module" src="dashboard.js"></script>
+</body>
+</html>
