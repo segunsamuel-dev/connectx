@@ -11,9 +11,9 @@
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
 body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-.app-canvas { display: flex; height: 100vh; }
+.app-canvas { display: flex; height: 100vh; width: 100vw; }
 
-/* 🧭 THE ENGINEERED RAIL (FIXED) */
+/* 🧭 RAIL */
 .rail { 
     width: 75px; 
     background: var(--sidebar); 
@@ -27,7 +27,6 @@ body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidde
 .rail-top { margin-bottom: 40px; }
 .rail-logo { font-size: 1.4rem; font-weight: 900; color: var(--primary); letter-spacing: -1px; }
 
-/* This centers the group vertically and keeps them together */
 .rail-center { 
     flex: 1; 
     display: flex; 
@@ -59,7 +58,6 @@ body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidde
     box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
 }
 
-/* Tooltip for the OS feel */
 .tooltip {
     position: absolute; left: 100%; margin-left: 15px; background: var(--text); color: white;
     padding: 5px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; opacity: 0; pointer-events: none; transition: 0.2s;
@@ -89,7 +87,14 @@ body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidde
 }
 
 /* 📂 NAVIGATOR */
-.navigator { width: 320px; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: #fff; }
+.navigator { 
+    width: 320px; 
+    border-right: 1px solid var(--border); 
+    display: flex; 
+    flex-direction: column; 
+    background: #fff; 
+    z-index: 10;
+}
 .nav-header { padding: 30px 20px; }
 .nav-header h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; color: var(--text); }
 
@@ -117,7 +122,13 @@ body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidde
 .c-status { font-size: 0.8rem; color: var(--text-muted); }
 
 /* 💬 NEXUS */
-.nexus { flex: 1; display: flex; flex-direction: column; background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 30px 30px; }
+.nexus { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    background-image: radial-gradient(var(--border) 1px, transparent 1px); 
+    background-size: 30px 30px; 
+}
 .nexus-header { 
     padding: 20px 40px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
     display: flex; justify-content: space-between; align-items: center;
@@ -148,10 +159,47 @@ body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidde
 .attach-btn, .send-btn { background: none; border: none; font-size: 1.3rem; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
 .send-btn:hover { color: var(--primary); transform: translateY(-2px); }
 
-/* MOBILE */
+/* 📱 MOBILE FIX - SMART RESTRUCTURING */
 @media (max-width: 768px) {
-    .navigator, .rail { display: none; }
+    .app-canvas { flex-direction: column; position: relative; }
+
+    /* The Rail becomes a bottom navbar */
+    .rail {
+        width: 100%; height: 65px; flex-direction: row; 
+        position: fixed; bottom: 0; left: 0; padding: 0 15px;
+        z-index: 100; border-right: none; border-top: 1px solid var(--border);
+    }
+    .rail-top, .rail-bottom, .tooltip { display: none; }
+    .rail-center { flex-direction: row; width: 100%; justify-content: space-around; gap: 0; }
+    .rail-btn { width: 50px; height: 50px; }
+
+    /* Navigator (Original Tab) now takes full width */
+    .navigator { 
+        width: 100%; height: calc(100vh - 65px); 
+        position: absolute; top: 0; left: 0; 
+    }
+
+    /* Nexus (Chat Window) sits on top of navigator but is hidden by default */
+    /* Add 'active' class via JS to the .nexus when you click a contact */
+    .nexus {
+        position: fixed; top: 0; left: 0; 
+        width: 100%; height: calc(100vh - 65px);
+        background: var(--bg);
+        z-index: 20;
+        display: none; /* Change to 'flex' when chatting */
+    }
+    
+    /* Example: if you want Ella's chat to show now, manually set display: flex */
+    .nexus.active { display: flex; }
+
     .nexus-header { padding: 15px 20px; }
-    .chat-stream { padding: 20px; }
+    .chat-stream { padding: 20px; padding-bottom: 100px; }
     .msg-group { max-width: 85%; }
+
+    /* Fix Input Bar at bottom of screen */
+    .nexus-input {
+        position: fixed; bottom: 75px; left: 0; width: 100%;
+        padding: 10px 15px; background: transparent; z-index: 30;
+    }
+    .input-pill { background: white; border: 1px solid var(--border); }
 }
