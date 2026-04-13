@@ -21,73 +21,116 @@
 
 body { 
     background-color: var(--bg);
-    /* Subtle Grid Texture */
     background-image: radial-gradient(var(--border) 1px, transparent 1px);
     background-size: 30px 30px;
     color: var(--text); 
-    overflow: hidden; 
     transition: 0.3s; 
+    overflow-x: hidden; /* Prevent horizontal wobble on mobile */
 }
 
-.app-canvas { display: flex; height: 100vh; }
+/* 📱 MOBILE NAVIGATION (Bottom Bar) & 💻 DESKTOP (Side Rail) */
+.app-canvas { 
+    display: flex; 
+    height: 100vh; 
+    flex-direction: row; /* Desktop Default */
+}
 
-/* 🧭 NAVIGATION RAIL */
 .rail {
-    width: 80px; background: var(--sidebar); border-right: 1px solid var(--border);
-    display: flex; flex-direction: column; justify-content: space-between; padding: 40px 0; align-items: center;
+    width: 80px; 
+    background: var(--sidebar); 
+    border-right: 1px solid var(--border);
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; 
+    padding: 40px 0; 
+    align-items: center;
+    z-index: 100;
 }
-.rail-logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
-.rail-logo span { color: var(--text); }
 
+.rail-logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
 .rail-actions { display: flex; flex-direction: column; gap: 24px; }
 .rail-link {
     font-size: 1.5rem; color: var(--text-muted); background: none; border: none; cursor: pointer; transition: 0.3s;
 }
 .rail-link.active { color: var(--primary); }
-.rail-link:hover { color: var(--primary); transform: scale(1.1); }
 
 .rail-user { 
     width: 44px; height: 44px; background: var(--primary); color: white; 
     border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; 
 }
 
-/* 🏢 VIEWPORT */
-.viewport { flex: 1; padding: 60px 80px; overflow-y: auto; }
-.view-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px; }
-.sys-tag { font-family: monospace; font-size: 0.7rem; color: var(--primary); letter-spacing: 2px; display: block; margin-bottom: 8px; }
+/* 🏢 VIEWPORT RESPONSIVENESS */
+.viewport { 
+    flex: 1; 
+    padding: 60px 80px; 
+    overflow-y: auto; 
+    width: 100%;
+}
+
 .view-header h1 { font-size: 3.5rem; font-weight: 800; letter-spacing: -3px; }
 
-/* 👤 BENTO GRID */
-.bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+/* 👤 BENTO GRID RESPONSIVENESS */
+.bento-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 24px; 
+}
 
 .bento-card {
-    background: var(--bg); border: 1px solid var(--border); border-radius: 24px;
-    padding: 32px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--bg); 
+    border: 1px solid var(--border); 
+    border-radius: 24px;
+    padding: 32px; 
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.bento-card:hover { border-color: var(--primary); box-shadow: 0 10px 30px var(--primary-soft); }
 
 .identity-card { grid-column: span 2; display: flex; align-items: center; gap: 32px; }
 .pfp-hex { 
     width: 110px; height: 110px; background: var(--primary); color: white; 
     border-radius: 30px; display: flex; align-items: center; justify-content: center; 
-    font-size: 2.8rem; font-weight: 800; 
+    font-size: 2.8rem; font-weight: 800; flex-shrink: 0;
 }
 
-.id-meta h2 { font-size: 1.8rem; font-weight: 800; letter-spacing: -1px; }
-.id-meta span { color: var(--text-muted); font-size: 0.9rem; }
-.meta-actions { margin-top: 15px; }
+/* --- 📱 MOBILE BREAKPOINT --- */
+@media (max-width: 768px) {
+    .app-canvas { flex-direction: column; }
 
-.edit-pill {
-    background: var(--primary-soft); color: var(--primary); border: none;
-    padding: 8px 16px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; cursor: pointer;
+    /* Move Sidebar to Bottom */
+    .rail {
+        width: 100%;
+        height: 70px;
+        flex-direction: row;
+        padding: 0 30px;
+        border-right: none;
+        border-top: 1px solid var(--border);
+        position: fixed;
+        bottom: 0;
+        left: 0;
+    }
+
+    .rail-logo, .rail-footer button#theme-btn { display: none; } /* Hide logo on mobile rail to save space */
+    .rail-actions { flex-direction: row; width: 100%; justify-content: space-around; }
+    .rail-user { width: 35px; height: 35px; font-size: 0.7rem; }
+
+    /* Adjust Viewport */
+    .viewport { 
+        padding: 40px 20px 100px 20px; /* Add bottom padding so content isn't hidden by rail */
+    }
+
+    .view-header h1 { font-size: 2.2rem; letter-spacing: -1px; }
+
+    /* Stack the Grid */
+    .bento-grid { 
+        grid-template-columns: 1fr; 
+    }
+
+    .identity-card { 
+        grid-column: span 1; 
+        flex-direction: column; 
+        text-align: center;
+        gap: 15px;
+    }
+
+    .pfp-hex { width: 80px; height: 80px; font-size: 2rem; }
+    .id-meta h2 { font-size: 1.5rem; }
 }
-
-.placeholder-module { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; color: var(--primary); font-weight: 800; font-size: 0.8rem; opacity: 0.6; }
-.placeholder-module i { font-size: 2rem; }
-
-/* 📊 CONTEXT SIDEBAR */
-.context-sidebar { width: 300px; border-left: 1px solid var(--border); padding: 60px 30px; background: var(--sidebar); }
-.panel-block { margin-bottom: 40px; }
-.panel-block h4 { font-size: 0.7rem; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 20px; }
-.orb-stack { display: flex; gap: 8px; }
-.orb { width: 40px; height: 40px; border-radius: 12px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; }
