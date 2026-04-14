@@ -1,80 +1,118 @@
+
 import { supabase } from './supabase.js';
 
-class ConnectX_Nexus {
-    constructor() {
-        this.activeChat = null;
-        this.user = null;
-        this.boot();
-    }
+// DOM Elements
+const contactList = document.getElementById('dynamic-contact-list');
+const chatStream = document.getElementById('chat-stream');
+const messageInput = document.getElementById('message-input');
+const sendBtn = document.getElementById('send-btn');
+const chatHeader = document.getElementById('chat-header');
+const inputArea = document.getElementById('input-area');
 
-    async boot() {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return window.location.href = 'login.html';
-        
-        this.user = user;
-        this.setupUI();
-        this.listen();
-    }
+let currentUser = null;
+let activeReceiverId = null;
 
-    setupUI() {
-        // Sync the sidebar avatar with the logged-in user
-        const navAvatar = document.getElementById('nav-avatar');
-        if (navAvatar) {
-            const name = this.user.user_metadata.display_name || "U";
-            navAvatar.innerText = name.charAt(0).toUpperCase();
-        }
-    }
+async function init() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    currentUser = user;
 
-    listen() {
-        const sendBtn = document.querySelector('.send-btn');
-        const input = document.getElementById('message-input');
-
-        // 1. Handle Sending Messages
-        if (sendBtn && input) {
-            const sendMessage = () => {
-                if (input.value.trim() !== "") {
-                    this.renderMessage(input.value, 'outgoing');
-                    input.value = ""; // Clear input
-                    // TODO: Push to Supabase Table 'messages'
-                }
-            };
-
-            sendBtn.addEventListener('click', sendMessage);
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') sendMessage();
-            });
-        }
-
-        // 2. Add Friend Trigger
-        const addFriendBtn = document.querySelector('.add-friend-btn');
-        if (addFriendBtn) {
-            addFriendBtn.addEventListener('click', () => {
-                const friendID = prompt("ENTER_FRIEND_ID_OR_EMAIL:");
-                if (friendID) {
-                    console.log("Initializing Handshake with:", friendID);
-                    // TODO: Logic for friend request
-                }
-            });
-        }
-    }
-
-    renderMessage(text, type) {
-        const stream = document.getElementById('chat-stream');
-        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
-        const msgHTML = `
-            <div class="msg-group ${type}">
-                <div class="msg-bubble">${text}</div>
-                <span class="msg-time">${time}</span>
-            </div>
-        `;
-        
-        stream.insertAdjacentHTML('beforeend', msgHTML);
-        stream.scrollTop = stream.scrollHeight; // Auto-scroll to bottom
-    }
+    document.getElementById('my-avatar-display').innerText = user.email[0].toUpperCase();
+    
+    fetchContacts();
+    setupRealtime();
 }
 
-// Initialize the Nexus
-document.addEventListener('DOMContentLoaded', () => {
-    new ConnectX_Nexus();
-});
+// 1. Fetch Real People (Profiles)
+async function fetchContacts() {
+    const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .not('id', 'eq', currentUser.id);
+
+    if (error) return console.error(error);
+
+    contactList.innerHTML = '';
+    profiles.forEach(profile => {
+        const card = document.createElement('div');
+        card.className = 'contact-card';
+        card.innerHTML = `
+            <div class="c-avatar">${profile.username[0].toUpperCase()}</div>
+            <div class="c-info">
+                <div class="c-name">${profile.username}</div>
+                <div class="c-status">Uplink Ready</div>
+            </div>
+        `;
+        card.onclick = () => openChat(profile);
+        contactList.appendChild(card);
+    });
+}
+
+// 2. Open Chat for Specific User
+async function openChat(profile) {
+    activeReceiverId = profile.id;
+    
+    // UI Updates
+    chatHeader.style.display = 'flex';
+    inputArea.style.display = 'block';
+    document.getElementById('active-username').innerText = profile.username;
+    document.getElementById('active-orb').innerText = profile.username[0].toUpperCase();
+    
+    document.querySelectorAll('.contact-card').forEach(c => c.classList.remove('active'));
+    // Set active class logic here if needed
+
+    loadMessageHistory();
+}
+
+// 3. Load Real Message History
+async function loadMessageHistory() {
+    const { data: messages } = await supabase
+        .from('messages')
+        .select('*')
+        .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${activeReceiverId}),and(sender_id.eq.${activeReceiverId},receiver_id.eq.${currentUser.id})`)
+        .order('created_at', { ascending: true });
+
+    chatStream.innerHTML = '';
+    messages?.forEach(msg => renderMessage(msg));
+}
+
+// 4. Send Logic
+async function sendMessage() {
+    const content = messageInput.value.trim();
+    if (!content || !activeReceiverId) return;
+
+    const { error } = await supabase.from('messages').insert([{
+        sender_id: currentUser.id,
+        receiver_id: activeReceiverId,
+        content: content
+    }]);
+
+    if (!error) messageInput.value = '';
+}
+
+function renderMessage(msg) {
+    const isMe = msg.sender_id === currentUser.id;
+    const group = document.createElement('div');
+    group.className = `msg-group ${isMe ? 'outgoing' : 'incoming'}`;
+    group.innerHTML = `<div class="msg-bubble">${msg.content}</div>`;
+    chatStream.appendChild(group);
+    chatStream.scrollTop = chatStream.scrollHeight;
+}
+
+// 5. Global Realtime Listener
+function setupRealtime() {
+    supabase.channel('messages')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+            const msg = payload.new;
+            // Only render if it's the current open chat
+            if ((msg.sender_id === activeReceiverId && msg.receiver_id === currentUser.id) || 
+                (msg.sender_id === currentUser.id && msg.receiver_id === activeReceiverId)) {
+                renderMessage(msg);
+            }
+        }).subscribe();
+}
+
+sendBtn.onclick = sendMessage;
+messageInput.onkeypress = (e) => e.key === 'Enter' && sendMessage();
+
+init();
