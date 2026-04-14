@@ -1,1 +1,107 @@
 
+:root {
+    --primary: #2563eb;
+    --primary-glow: rgba(37, 99, 235, 0.2);
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+
+.app-canvas { display: flex; height: 100vh; }
+
+/* Discovery Main Area */
+.discovery-engine { flex: 1; overflow-y: auto; padding: 60px 80px; background: radial-gradient(circle at top right, #f0f7ff, transparent 600px); }
+
+.discovery-header { max-width: 800px; margin: 0 auto 60px; text-align: center; }
+.discovery-header h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 10px; }
+.discovery-header p { color: var(--text-muted); font-size: 1.1rem; }
+
+/* The Search Portal */
+.search-portal { 
+    position: relative; margin-top: 40px; background: white; 
+    border-radius: 20px; padding: 15px 25px; display: flex; align-items: center; gap: 15px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.05); border: 1px solid var(--border);
+    transition: 0.3s;
+}
+.search-portal:focus-within { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 25px 60px var(--primary-glow); }
+.search-portal input { flex: 1; border: none; outline: none; font-size: 1.1rem; font-weight: 500; }
+.search-portal i { font-size: 1.3rem; color: var(--primary); }
+
+/* Grid & Cards */
+.discovery-section { max-width: 1000px; margin: 0 auto 40px; }
+.section-label { font-family: monospace; font-size: 0.75rem; color: var(--primary); font-weight: 800; margin-bottom: 20px; opacity: 0.7; }
+
+.grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+.user-card { 
+    background: white; border: 1px solid var(--border); border-radius: 24px; padding: 25px;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.user-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.04); border-color: var(--primary); }
+
+.card-avatar { 
+    width: 70px; height: 70px; background: var(--surface); border-radius: 22px; 
+    display: flex; align-items: center; justify-content: center; font-size: 1.5rem; 
+    font-weight: 800; color: var(--primary); margin-bottom: 15px; border: 1px solid var(--border);
+}
+
+.card-name { font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; }
+.card-meta { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px; }
+
+.add-btn { 
+    width: 100%; padding: 12px; border-radius: 14px; border: none; 
+    background: var(--primary); color: white; font-weight: 700; cursor: pointer;
+    transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.add-btn:hover { opacity: 0.9; transform: scale(1.02); }
+.add-btn.pending { background: var(--surface); color: var(--text-muted); cursor: default; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .discovery-engine { padding: 40px 20px; }
+    .discovery-header h1 { font-size: 1.8rem; }
+    .rail { display: none; } /* On mobile, we might use a bottom nav or burger menu later */
+}
+
+
+
+/* Update the container to make room for the button */
+.search-portal {
+    padding: 8px 10px 8px 25px; /* Reduced right padding for the button */
+    display: flex;
+    align-items: center;
+}
+
+.portal-search-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+.portal-search-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 15px var(--primary-glow);
+    opacity: 0.95;
+}
+
+.portal-search-btn:active {
+    transform: scale(0.98);
+}
+
+/* Adjust the input to not squash against the button */
+#user-search-input {
+    margin-right: 10px;
+}
