@@ -19,15 +19,12 @@
             <nav class="rail-center">
                 <button class="rail-btn" onclick="window.location.href='dashboard.html'">
                     <i class="lni lni-grid-alt"></i>
-                    <span class="tooltip"></span>
                 </button>
                 <button class="rail-btn active">
                     <i class="lni lni-comments"></i>
-                    <span class="tooltip"></span>
                 </button>
                 <button class="rail-btn" onclick="window.location.href='settings.html'">
                     <i class="lni lni-cog"></i>
-                    <span class="tooltip"></span>
                 </button>
             </nav>
 
@@ -43,7 +40,7 @@
                     <i class="lni lni-search-alt"></i>
                     <input type="text" placeholder="Search chats..." id="contact-search">
                 </div>
-                <button class="add-friend-btn" id="add-friend-trigger">
+                <button class="add-friend-btn" id="add-friend-trigger" onclick="window.location.href='add.html'">
                     <i class="lni lni-plus"></i> ADD FRIEND
                 </button>
             </div>
@@ -53,21 +50,21 @@
         </section>
 
         <main class="nexus" id="nexus-window">
-    <header class="nexus-header" id="chat-header" style="display: none;">
-        <div class="active-user">
-            <button class="mobile-back" id="close-chat"><i class="lni lni-arrow-left"></i></button>
-            
-            <div class="user-orb" id="active-orb">?</div>
-            <div>
-                <h4 id="active-username">Select a chat</h4>
-                <span class="sys-tag" id="active-status">// UPLINK_STABLE</span>
-            </div>
-        </div>
-        <div class="nexus-utils">
-            <button class="util-btn"><i class="lni lni-phone"></i></button>
-            <button class="util-btn"><i class="lni lni-more-alt"></i></button>
-        </div>
-    </header>
+            <header class="nexus-header" id="chat-header" style="display: none;">
+                <div class="active-user">
+                    <button class="mobile-back" id="close-chat"><i class="lni lni-arrow-left"></i></button>
+                    
+                    <div class="user-orb" id="active-orb">?</div>
+                    <div>
+                        <h4 id="active-username">Select a chat</h4>
+                        <span class="sys-tag" id="active-status">// UPLINK_STABLE</span>
+                    </div>
+                </div>
+                <div class="nexus-utils">
+                    <button class="util-btn"><i class="lni lni-phone"></i></button>
+                    <button class="util-btn"><i class="lni lni-more-alt"></i></button>
+                </div>
+            </header>
 
             <div class="chat-stream" id="chat-stream">
                 <div class="empty-state">
