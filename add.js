@@ -10,17 +10,35 @@ const pendingList = document.getElementById('pending-list');
 let currentUser = null;
 
 async function init() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    currentUser = user;
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error || !session) return;
     
-    // Load existing requests sent to you
+    currentUser = session.user;
+    
+    // Initial load of requests
     loadPendingRequests();
+
+    /**
+     * REAL-TIME UPGRADE: 
+     * This listens for any changes to the 'friendships' table.
+     * If someone sends you a request while you're on the page, it pops up instantly.
+     */
+    supabase
+        .channel('friendship-changes')
+        .on('postgres_changes', { 
+            event: '*', 
+            schema: 'public', 
+            table: 'friendships',
+            filter: `receiver_id=eq.${currentUser.id}` 
+        }, () => {
+            loadPendingRequests();
+        })
+        .subscribe();
 }
 
 // --- SEARCH LOGIC ---
 
-const performSearch = () => {
+const performSearch = async () => {
     const query = searchInput.value.trim();
     if (query.length > 0) {
         executeSearch(query);
@@ -33,26 +51,21 @@ const performSearch = () => {
     }
 };
 
-// Trigger on Click
 searchTriggerBtn.onclick = performSearch;
-
-// Trigger on Enter Key
-searchInput.onkeypress = (e) => {
-    if (e.key === 'Enter') performSearch();
-};
+searchInput.onkeypress = (e) => { if (e.key === 'Enter') performSearch(); };
 
 async function executeSearch(query) {
     resultsGrid.innerHTML = `<p class="text-muted">Scanning the Verse...</p>`;
 
     const { data: users, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, username')
         .or(`username.ilike.%${query}%,email.ilike.%${query}%`)
         .not('id', 'eq', currentUser.id) 
         .limit(10);
 
     if (error) {
-        console.error("Search error:", error.message);
+        console.error("Search Error:", error.message);
         return;
     }
 
@@ -63,24 +76,24 @@ function renderResults(users) {
     resultsGrid.innerHTML = '';
     
     if (users.length === 0) {
-        resultsGrid.innerHTML = `<p class="text-muted">No users found in this sector.</p>`;
+        resultsGrid.innerHTML = `<p class="empty-msg">No residents found in this sector.</p>`;
         return;
     }
 
     users.forEach(user => {
+        const name = user.username || "Anonymous";
         const card = document.createElement('div');
         card.className = 'user-card';
         card.innerHTML = `
-            <div class="card-avatar">${user.username[0].toUpperCase()}</div>
-            <div class="card-name">${user.username}</div>
+            <div class="card-avatar">${name[0].toUpperCase()}</div>
+            <div class="card-name">${name}</div>
             <div class="card-meta">ConnectX Resident</div>
             <button class="add-btn" id="btn-${user.id}">
                 <i class="lni lni-plus"></i> Send Request
             </button>
         `;
         
-        const btn = card.querySelector(`#btn-${user.id}`);
-        btn.onclick = () => sendFriendRequest(user.id, btn);
+        card.querySelector(`#btn-${user.id}`).onclick = (e) => sendFriendRequest(user.id, e.target);
         resultsGrid.appendChild(card);
     });
 }
@@ -90,17 +103,13 @@ function renderResults(users) {
 async function sendFriendRequest(targetId, btnElement) {
     const { error } = await supabase
         .from('friendships')
-        .insert([
-            { sender_id: currentUser.id, receiver_id: targetId, status: 'pending' }
-        ]);
+        .insert([{ sender_id: currentUser.id, receiver_id: targetId, status: 'pending' }]);
 
     if (error) {
-        console.error("Link Error:", error.message);
-        alert("Transmission failed. Request might already exist.");
+        alert("Request already in transmission.");
         return;
     }
 
-    // Professional UI State update
     btnElement.innerHTML = `<i class="lni lni-checkmark"></i> Requested`;
     btnElement.classList.add('pending');
     btnElement.disabled = true;
@@ -109,29 +118,26 @@ async function sendFriendRequest(targetId, btnElement) {
 async function loadPendingRequests() {
     const { data: incoming, error } = await supabase
         .from('friendships')
-        .select(`
-            id,
-            sender_id,
-            profiles:sender_id (username, email)
-        `)
+        .select(`id, profiles:sender_id (username)`)
         .eq('receiver_id', currentUser.id)
         .eq('status', 'pending');
 
-    if (error) return;
+    if (error || !incoming) return;
 
-    if (incoming && incoming.length > 0) {
+    if (incoming.length > 0) {
         pendingSection.style.display = 'block';
         pendingList.innerHTML = '';
         
         incoming.forEach(req => {
+            const name = req.profiles?.username || 'Unknown';
             const card = document.createElement('div');
             card.className = 'user-card pending-card';
             card.innerHTML = `
-                <div class="card-avatar">${req.profiles.username[0].toUpperCase()}</div>
-                <div class="card-name">${req.profiles.username}</div>
-                <div class="card-actions" style="display:flex; gap:10px; margin-top:15px; width:100%;">
-                    <button class="add-btn accept" onclick="respond('${req.id}', 'accepted')" style="background:#22c55e;">Accept</button>
-                    <button class="add-btn decline" onclick="respond('${req.id}', 'declined')" style="background:#ef4444;">Decline</button>
+                <div class="card-avatar">${name[0].toUpperCase()}</div>
+                <div class="card-name">${name}</div>
+                <div class="card-actions" style="display:flex; gap:10px; margin-top:10px;">
+                    <button class="add-btn accept" onclick="respond('${req.id}', 'accepted')" style="background:#22c55e; flex:1;">Accept</button>
+                    <button class="add-btn decline" onclick="respond('${req.id}', 'declined')" style="background:#ef4444; flex:1;">Decline</button>
                 </div>
             `;
             pendingList.appendChild(card);
@@ -141,18 +147,14 @@ async function loadPendingRequests() {
     }
 }
 
-// Global Response Handler
+// Attach to window so HTML buttons can find it
 window.respond = async (requestId, newStatus) => {
     const { error } = await supabase
         .from('friendships')
         .update({ status: newStatus })
         .eq('id', requestId);
 
-    if (!error) {
-        // Smoothly refresh the UI
-        loadPendingRequests();
-        // If accepted, it will now appear in chat.js contacts automatically
-    }
+    if (!error) loadPendingRequests();
 };
 
 init();
