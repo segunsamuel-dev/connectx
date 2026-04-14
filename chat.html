@@ -52,25 +52,27 @@
                 </div>
         </section>
 
-        <main class="nexus">
-            <header class="nexus-header" id="chat-header" style="display: none;">
-                <div class="active-user">
-                    <div class="user-orb" id="active-orb">?</div>
-                    <div>
-                        <h4 id="active-username">Select a chat</h4>
-                        <span class="sys-tag" id="active-status">// UPLINK_STABLE</span>
-                    </div>
-                </div>
-                <div class="nexus-utils">
-                    <button class="util-btn"><i class="lni lni-phone"></i></button>
-                    <button class="util-btn"><i class="lni lni-more-alt"></i></button>
-                </div>
-            </header>
+        <main class="nexus" id="nexus-window">
+    <header class="nexus-header" id="chat-header" style="display: none;">
+        <div class="active-user">
+            <button class="mobile-back" id="close-chat"><i class="lni lni-arrow-left"></i></button>
+            
+            <div class="user-orb" id="active-orb">?</div>
+            <div>
+                <h4 id="active-username">Select a chat</h4>
+                <span class="sys-tag" id="active-status">// UPLINK_STABLE</span>
+            </div>
+        </div>
+        <div class="nexus-utils">
+            <button class="util-btn"><i class="lni lni-phone"></i></button>
+            <button class="util-btn"><i class="lni lni-more-alt"></i></button>
+        </div>
+    </header>
 
             <div class="chat-stream" id="chat-stream">
                 <div class="empty-state">
                     <i class="lni lni-bubble" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.2;"></i>
-                    <p>Select a contact to begin a secure transmission.</p>
+                    <p>Select a contact to start connecting.</p>
                 </div>
             </div>
 
