@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConnectX | Discovery</title>
+    <link rel="stylesheet" href="add.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
+</head>
+<body>
 
+    <div class="app-canvas">
+        <aside class="rail">
+            <div class="rail-logo">CX<span>.</span></div>
+            <nav class="rail-center">
+                <button class="rail-btn" onclick="window.location.href='dashboard.html'"><i class="lni lni-grid-alt"></i></button>
+                <button class="rail-btn" onclick="window.location.href='chat.html'"><i class="lni lni-comments"></i></button>
+                <button class="rail-btn active"><i class="lni lni-users"></i></button>
+            </nav>
+        </aside>
+
+        <main class="discovery-engine">
+            <header class="discovery-header">
+                <div class="header-content">
+                    <h1>Expand Your Verse</h1>
+                    <p>Search for users across the ConnectX network.</p>
+                </div>
+                
+               <div class="search-portal">
+                  <i class="lni lni-search-alt"></i>
+                 <input type="text" id="user-search-input" placeholder="Enter username or email...">
+                  <button id="search-trigger-btn" class="portal-search-btn">
+                   Search
+               </button>
+                <div class="search-glow"></div>
+               </div>
+            </header>
+
+            <section class="discovery-body">
+                <div class="discovery-section" id="pending-section" style="display: none;">
+                    <h3 class="section-label">// INCOMING_REQUESTS</h3>
+                    <div class="grid-layout" id="pending-list">
+                        </div>
+                </div>
+
+                <div class="discovery-section">
+                    <h3 class="section-label">DISCOVER NEW Friends</h3>
+                    <div class="grid-layout" id="search-results">
+                        <div class="initial-state">
+                            <i class="lni lni-magnifier"></i>
+                            <p>Start typing to find connections</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="add.js"></script>
+</body>
+</html>
