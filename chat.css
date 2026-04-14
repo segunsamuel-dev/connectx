@@ -57,3 +57,42 @@ body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidde
 .input-pill { background: #fff; border: 1px solid var(--border); border-radius: 22px; padding: 12px 25px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
 .input-pill input { flex: 1; border: none; outline: none; font-size: 1rem; }
 .send-btn { background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+
+/* --- RESPONSIVE CORE --- */
+
+.mobile-back {
+    display: none; /* Hidden on Desktop */
+    background: none; border: none;
+    font-size: 1.2rem; color: var(--primary);
+    margin-right: 10px; cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .rail { width: 60px; }
+    .navigator { width: calc(100vw - 60px); }
+
+    /* The Nexus slides over everything on mobile */
+    .nexus {
+        position: fixed;
+        top: 0; right: 0;
+        width: 100vw; height: 100vh;
+        z-index: 100;
+        transform: translateX(100%); /* Start off-screen */
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: white;
+    }
+
+    .nexus.active {
+        transform: translateX(0); /* Slide in */
+    }
+
+    .mobile-back { display: block; }
+    
+    .nexus-header { padding: 15px 20px; }
+    .chat-stream { padding: 20px; }
+    .nexus-input { padding: 15px 20px; }
+}
+
+/* Ensure the rail buttons don't get squashed */
+.rail-btn { width: 40px; height: 40px; }
