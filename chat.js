@@ -1,13 +1,12 @@
-
 import { supabase } from './supabase.js';
-
-// DOM Elements
 const contactList = document.getElementById('dynamic-contact-list');
 const chatStream = document.getElementById('chat-stream');
 const messageInput = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
 const chatHeader = document.getElementById('chat-header');
 const inputArea = document.getElementById('input-area');
+const nexusWindow = document.getElementById('nexus-window'); // Target for sliding
+const closeChatBtn = document.getElementById('close-chat');
 
 let currentUser = null;
 let activeReceiverId = null;
@@ -17,29 +16,29 @@ async function init() {
     if (!user) return;
     currentUser = user;
 
-    document.getElementById('my-avatar-display').innerText = user.email[0].toUpperCase();
+    const avatarChar = user.email ? user.email[0].toUpperCase() : '?';
+    document.getElementById('my-avatar-display').innerText = avatarChar;
     
     fetchContacts();
     setupRealtime();
 }
 
-// 1. Fetch Real People (Profiles)
 async function fetchContacts() {
     const { data: profiles, error } = await supabase
         .from('profiles')
         .select('*')
         .not('id', 'eq', currentUser.id);
 
-    if (error) return console.error(error);
+    if (error) return;
 
     contactList.innerHTML = '';
     profiles.forEach(profile => {
         const card = document.createElement('div');
         card.className = 'contact-card';
         card.innerHTML = `
-            <div class="c-avatar">${profile.username[0].toUpperCase()}</div>
+            <div class="c-avatar">${profile.username ? profile.username[0].toUpperCase() : '?'}</div>
             <div class="c-info">
-                <div class="c-name">${profile.username}</div>
+                <div class="c-name">${profile.username || 'Anonymous'}</div>
                 <div class="c-status">Uplink Ready</div>
             </div>
         `;
@@ -48,23 +47,27 @@ async function fetchContacts() {
     });
 }
 
-// 2. Open Chat for Specific User
-async function openChat(profile) {
+function openChat(profile) {
     activeReceiverId = profile.id;
     
-    // UI Updates
+    // UI Logic
     chatHeader.style.display = 'flex';
     inputArea.style.display = 'block';
     document.getElementById('active-username').innerText = profile.username;
-    document.getElementById('active-orb').innerText = profile.username[0].toUpperCase();
+    document.getElementById('active-orb').innerText = profile.username ? profile.username[0].toUpperCase() : '?';
     
-    document.querySelectorAll('.contact-card').forEach(c => c.classList.remove('active'));
-    // Set active class logic here if needed
+    // Mobile Slide-In
+    nexusWindow.classList.add('active');
 
     loadMessageHistory();
 }
 
-// 3. Load Real Message History
+// Mobile Back Logic
+function closeChat() {
+    nexusWindow.classList.remove('active');
+    activeReceiverId = null;
+}
+
 async function loadMessageHistory() {
     const { data: messages } = await supabase
         .from('messages')
@@ -76,7 +79,6 @@ async function loadMessageHistory() {
     messages?.forEach(msg => renderMessage(msg));
 }
 
-// 4. Send Logic
 async function sendMessage() {
     const content = messageInput.value.trim();
     if (!content || !activeReceiverId) return;
@@ -99,12 +101,10 @@ function renderMessage(msg) {
     chatStream.scrollTop = chatStream.scrollHeight;
 }
 
-// 5. Global Realtime Listener
 function setupRealtime() {
     supabase.channel('messages')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
             const msg = payload.new;
-            // Only render if it's the current open chat
             if ((msg.sender_id === activeReceiverId && msg.receiver_id === currentUser.id) || 
                 (msg.sender_id === currentUser.id && msg.receiver_id === activeReceiverId)) {
                 renderMessage(msg);
@@ -112,7 +112,9 @@ function setupRealtime() {
         }).subscribe();
 }
 
+// Events
 sendBtn.onclick = sendMessage;
 messageInput.onkeypress = (e) => e.key === 'Enter' && sendMessage();
+closeChatBtn.onclick = closeChat;
 
 init();
